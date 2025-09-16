@@ -4,6 +4,7 @@ import asyncio
 import logging
 from typing import List, AsyncGenerator
 import os
+from pathlib import Path
 # --- Pydantic and ADK Imports ---
 from pydantic import BaseModel, Field
 from google.adk.agents import LlmAgent, SequentialAgent, LoopAgent, BaseAgent
@@ -24,6 +25,12 @@ logging.getLogger('google.genai.models').setLevel(logging.ERROR)
 logging.getLogger('google.generativeai').setLevel(logging.ERROR)  # Fixed typo
 logging.getLogger('httpx').setLevel(logging.ERROR)
 logging.getLogger('google_genai').setLevel(logging.WARNING) # prevent AFC Call warning
+
+code_folder = Path(os.path.dirname(os.path.abspath(__file__)))
+
+os.chdir(code_folder)
+input_dir = code_folder.parent / "input"
+output_dir = code_folder.parent / "output"
 
 # ==============================================================================
 # SECTION 1: PYDANTIC OUTPUT SCHEMA (Unchanged)
@@ -260,7 +267,7 @@ def load_questions_from_file(filename: str) -> list:
         logger.error(f"Could not load questions from '{filename}': {e}")
         return []
 
-async def grade_ant_plus_main():
+async def grade_ant_plus_main(qa_file: Path):
     """Main function uses the master orchestrator to run the full process."""
     service = InMemorySessionService()
     runner = Runner(
@@ -269,7 +276,7 @@ async def grade_ant_plus_main():
         app_name="GradeAntPlus"
     )
 
-    input_questions = load_questions_from_file("qa.json")
+    input_questions = load_questions_from_file(qa_file)
     if not input_questions:
         return
 
@@ -332,5 +339,6 @@ async def grade_ant_plus_main():
 
 if __name__ == "__main__":
     os.system('clear')
-    asyncio.run(grade_ant_plus_main())
+    qa_file_path = input_dir / "qa.json"
+    asyncio.run(grade_ant_plus_main(qa_file_path))
     print("\n--- All questions processed. Session complete. ---")
