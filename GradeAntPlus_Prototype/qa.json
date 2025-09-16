@@ -1,0 +1,50 @@
+[
+    {
+        "question_id": "q1",
+        "question_text": "A car accelerates uniformly from rest to 20 m/s in 5 seconds. What is its acceleration?",
+        "student_answer": "a = (v - u)/t = (20 - 0)/5 = 4 m/s^2",
+        "reference_answer": "Acceleration is given by a = (v - u)/t = (20 - 0)/5 = 4 m/s^2"
+    },
+    {
+        "question_id": "q2",
+        "question_text": "A 5 kg object is pushed with a force of 10 N on a frictionless surface. What is its acceleration?",
+        "student_answer": "a = F/m = 10/5 = 2 m/s",
+        "reference_answer": "Using Newton's Second Law, a = F/m = 10 N / 5 kg = 2 m/s^2"
+    },
+    {
+        "question_id": "q3",
+        "question_text": "What is the gravitational potential energy of a 3 kg object at a height of 8 m? (g = 9.8 m/s^2)",
+        "student_answer": "PE = mgh = 3 * 10 * 8 = 240 J",
+        "reference_answer": "Gravitational potential energy is PE = mgh = 3 * 9.8 * 8 = 235.2 J"
+    },
+    {
+        "question_id": "q4",
+        "question_text": "A wave has a frequency of 2 Hz and a wavelength of 3 m. What is its speed?",
+        "student_answer": "v = f * λ = 2 * 3 = 6 m/s",
+        "reference_answer": "Wave speed is v = f * λ = 2 Hz * 3 m = 6 m/s"
+    },
+    {
+        "question_id": "q5",
+        "question_text": "A 100 W light bulb is left on for 5 hours. How much energy is consumed in kWh?",
+        "student_answer": "E = P * t = 100 * 5 = 500 kWh",
+        "reference_answer": "Energy is E = P * t = 100 W * 5 h = 500 Wh = 0.5 kWh"
+    },
+    {
+        "question_id": "q6",
+        "question_text": "A projectile is launched horizontally at 15 m/s from a height of 20 m. How long does it take to hit the ground? (g = 9.8 m/s^2)",
+        "student_answer": "t = sqrt(2h/g) = sqrt(2*20/10) = 2 s",
+        "reference_answer": "Time to fall is t = sqrt(2h/g) = sqrt(2*20/9.8) ≈ 2.02 s"
+    },
+    {
+        "question_id": "q7",
+        "question_text": "Describe the momentum of a 4 kg object moving at 5 m/s and calculate its value.",
+        "student_answer": "p = m * v^2 = 4 * 5^2 = 100 kg m/s",
+        "reference_answer": "Momentum is mass times velocity, p = m * v = 4 kg * 5 m/s = 20 kg m/s"
+    },
+    {
+        "question_id": "q8",
+        "question_text": "A capacitor in a circuit has a capacitance of 2 µF and a voltage of 50 V. What is the charge stored?",
+        "student_answer": "Q = C * V = 2 * 50 = 100 µC",
+        "reference_answer": "Charge in a capacitor is Q = C * V = 2 µF * 50 V = 100 µC"
+    }
+]
