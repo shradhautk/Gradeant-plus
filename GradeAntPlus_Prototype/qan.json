@@ -1,0 +1,50 @@
+[
+    {
+        "question_id": "np1",
+        "question_text": "Calculate the binding energy of a helium-4 nucleus given its mass is 4.002602 u and the masses of a proton and neutron are 1.007825 u and 1.008665 u, respectively. (1 u = 931.494 MeV/c^2)",
+        "student_answer": "BE = [(2*1.007825 + 2*1.008665) - 4.002602] * 931.494 = 28.3 MeV",
+        "reference_answer": "Binding energy is BE = [(Z*m_p + N*m_n) - M] * 931.494 = [(2*1.007825 + 2*1.008665) - 4.002602] * 931.494 ≈ 28.296 MeV"
+    },
+    {
+        "question_id": "np2",
+        "question_text": "A radioactive isotope has a half-life of 10 days. What fraction of the original sample remains after 20 days?",
+        "student_answer": "Fraction = (1/2)^(20/10) = 0.25",
+        "reference_answer": "Fraction remaining = (1/2)^(t/T) = (1/2)^(20/10) = 0.25"
+    },
+    {
+        "question_id": "np3",
+        "question_text": "Write the nuclear equation for the beta-minus decay of carbon-14.",
+        "student_answer": "C-14 → N-14 + e^-",
+        "reference_answer": "^14_6C → ^14_7N + e^- + ν̅_e"
+    },
+    {
+        "question_id": "np4",
+        "question_text": "Calculate the activity of a 1.0 µg sample of uranium-238 (half-life = 4.468×10^9 years, molar mass = 238 g/mol).",
+        "student_answer": "A = λN = (ln(2)/T) * (m/M) * N_A = (0.693/(4.468×10^9*3.156×10^7)) * (1×10^-6/238) * 6.022×10^23 = 12.4 Bq",
+        "reference_answer": "Activity is A = λN = (ln(2)/T) * (m/M) * N_A = (0.693/(4.468×10^9*3.156×10^7)) * (1×10^-6/238) * 6.022×10^23 ≈ 12.39 Bq"
+    },
+    {
+        "question_id": "np5",
+        "question_text": "What is the Q-value of the alpha decay of radium-226 to radon-222? Given masses: Ra-226 = 226.025410 u, Rn-222 = 222.017578 u, He-4 = 4.002602 u.",
+        "student_answer": "Q = [226.025410 - 222.017578] * 931.494 = 3730 MeV",
+        "reference_answer": "Q-value is Q = [m_parent - (m_daughter + m_alpha)] * 931.494 = [226.025410 - (222.017578 + 4.002602)] * 931.494 ≈ 4.871 MeV"
+    },
+    {
+        "question_id": "np6",
+        "question_text": "Describe the role of the strong nuclear force in holding the nucleus together.",
+        "student_answer": "The strong nuclear force binds protons and neutrons, overcoming repulsion between protons. It acts over a long range (~10 fm).",
+        "reference_answer": "The strong nuclear force is a short-range (~1 fm), attractive force that binds protons and neutrons in the nucleus, overcoming the repulsive Coulomb force between positively charged protons."
+    },
+    {
+        "question_id": "np7",
+        "question_text": "A nucleus undergoes gamma decay. What changes occur in its atomic and mass numbers?",
+        "student_answer": "No change in atomic or mass number, only energy is released.",
+        "reference_answer": "Gamma decay releases energy as a photon, with no change in atomic number (Z) or mass number (A)."
+    },
+    {
+        "question_id": "np8",
+        "question_text": "Calculate the radius of a carbon-12 nucleus using the formula R = R_0 A^(1/3), where R_0 = 1.2 fm and A is the mass number.",
+        "student_answer": "R = 1.2 * 12^(1/3) = 2.7 fm",
+        "reference_answer": "Nuclear radius is R = R_0 A^(1/3) = 1.2 * 12^(1/3) ≈ 2.77 fm"
+    }
+]
