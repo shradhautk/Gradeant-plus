@@ -27,5 +27,3 @@ gradeant-plus/
 ├── README.md
 └── requirements.txt
 ```
-
-By enclosing your tree in the triple backticks (```), you guarantee that when you commit the file and view it on GitHub, GitLab, or any modern Markdown viewer, it will render perfectly and maintain its shape.
