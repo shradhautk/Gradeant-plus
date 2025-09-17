@@ -8,15 +8,15 @@ Extending GradeAnt for interactive feedback and NotebookLM Style summary
 gradeant-plus/
 ├── data/
 │   ├── ga_format_input/
-│   │   ├── Narrie_HW3.json
-│   │   └── QP.json
+│   │   ├── Narrie_HW3.json        (sample entry)
+│   │   └── QP.json                (sample entry)
 │   ├── input/
-│   │   └── Narrie_HW3_with_QP.json
+│   │   └── Narrie_HW3_with_QP.json   (sample entry)
 │   └── output/
-│       └── Narrie_HW3_summary.md
+│       └── Narrie_HW3_summary.md     (sample entry)
 │
 ├── logs/
-│   └── gradeantplus.log
+│   └── gradeantplus.log           (sample entry)
 │
 ├── src/
 │   ├── agents.py
