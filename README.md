@@ -1,4 +1,8 @@
 # Gradeant-plus
+Developing the prototype for the EDU-Core Proposal
+
+The code requires GEMINI_API_KEY or GOOGLE_API_KEY in local environment
+=======
 Developing the prototype for the EDU-Core Proposal.
 Extending GradeAnt for interactive feedback and NotebookLM Style summary
 

@@ -1,0 +1,52 @@
+{
+  "homework": "Homework 3 (Due on 25th March) Please refer to G.WAS book as discussed in the class (https://link.springer.com/book/10.1007/978-3-540-49472-0)",
+  "questions": [
+    {
+      "question_number": 1,
+      "subparts": [
+        {
+          "subpart": "a",
+          "description": "Using the relativistic expression for electron-atom energy transfer, calculate the minimum electron energy required to displace an atom in Al. Assume threshold displacement energy of 25 eV for Al.",
+          "max_marks": 5,
+          "standard_answer": "Minimum energy for e⁻ required to displace an atom\n\n(a) Al with Ed = 25 eV and A = 27\n(in MeV)\nEd/A = 2*Ee*(Ee + 2*mec²) / mc² = 2147.7 * Ee * (Ee + 1.022)\n\n(in eV)\nA*Ed/2147.7 = Ee² + 1.022*Ee\n\nor\n\nEe² + 1.022*Ee - (A*Ed/2147) = 0\n                                            0.3144\n\nax² + bx + c = 0\nX₁₂ = (-b ± √(b² - 4ac)) / 2a   => Ee = (-1.022 ± √((1.022)² + (4)(1)(0.3144))) / 2\n\n=> Ee = 248 KeV      Aluminum",
+          "rubric": "2 points for setting up the relativistic energy transfer equation correctly. 1 point for correctly substituting the values. 1 point for solving the quadratic equation. 1 point for the correct answer within the range of 230 KeV to 260 KeV. Deduct 0.5 points for minor calculation errors. Deduct 1 point if units are missing or incorrect."
+        },
+        {
+          "subpart": "b",
+          "description": "Using the relativistic expression for electron-atom energy transfer, calculate the minimum electron energy required to displace an atom in Ta. Assume threshold displacement energy of 90 eV for Ta.",
+          "max_marks": 5,
+          "standard_answer": "(b) Ta with Ed = 90 eV and A = 181\n\nEe = (-1.022 ± √((1.022)² + 4*A*Ed/2147.7)) / 2 =  (-1.022 ± √((1.022)² + 30.339)) / 2\n\n=> Ee = 2.29 MeV  Tantalum",
+          "rubric": "2 points for setting up the relativistic energy transfer equation correctly. 1 point for correctly substituting the values. 1 point for solving the quadratic equation. 1 point for the correct answer within the range of 2.1 MeV to 2.4 MeV. Deduct 0.5 points for minor calculation errors. Deduct 1 point if units are missing or incorrect."
+        }
+      ]
+    },
+    {
+      "question_number": 2,
+      "description": "5 MeV Al ions are used to irradiate an Al sample. Determine whether these conditions represent the “high-energy” or “low-energy” regime for electronic stopping/ionization interactions in solids by comparing the electron orbital velocity of the bound electrons (Eq. 2.49 in lecture notes section 2.3) with the ion velocity (Eq. 2.47 in lecture notes). Using the appropriate electronic stopping power approximation, calculate the ion energy as a function of distance from the surface and determine the approximate range of the Al ions in Al. (see textbook for a convenient approximate relationship between the distance traveled by the ion R and the projected range Rp).",
+      "max_marks": 10,
+      "standard_answer": "5) 5-MeV Al ions on Al sample.\n\nVe,bound (m/s) = 2.2 x 10⁶ (Z)⅔   average velocity of bound electron.\n\nVion (m/s) = 1.41 x 10⁴ √(E(eV) / m₁ (amu))   ion velocity at kinetic energy E\n\n=> Ve,bound = 2.2 x 10⁶ (13)⅔ = 1.22 x 10⁷ m/s\n\nVion = 1.41 x 10⁴ * √(5 x 10⁶ / 27) = 6.067674 x 10⁶ m/s\n\n=> Vion << Ve,bound   low-energy ion approximation is valid\n\nAlternatively, use Was's eq 1.182 stating that low energy electronic stopping is valid for like atoms when\n\n0 < E (keV) < 37 (Z)⅔  => 0 < E < 5 MeV < 14.7 keV\nk ~ 0.3 N ⅔\n\nlow-energy approximation for dE/dx is valid!\n\ndE/dx = -kE½  => dE/E½ = -k dx\n\n∫ dE/E½ = -k ∫ dx\n\n2[(Ei)½ - (E(x))½ ] = kx\n\nE(x) = (Ei)½ - (kx/2)²\n\nN atoms/cm³ = (6.022 x 10²³) atoms/mol * 2.7 g/cm³ / 27 g/mol = 6.022 x 10²² atoms/cm³\n\n= 0.06022 atoms/Å³\n\nK = 0.3 N ⅔   with [K] = (eV)½ / Å\n\nK = (0.3)(0.06)(13)⅔\n\nK = 0.1 eV½/Å\n\nRange:  x = R for which (E(x) = 0)\n\n=> (Ei)½ = kR/2\n\n=> R = 2(Ei)½ / k = 2(5 x 10⁶)½ / 0.1\n\n=> R = 44,721 Å = 4.472 µm      ion Range\n\nThis estimation ignores energy loss due to nuclear collisions (and associated range), which becomes dominant process if Al slows down to ~80 keV => However, this produces an overall error < 10%! on range.",
+      "rubric": "2 points for correctly calculating the electron orbital velocity and ion velocity. 1 point for correctly identifying the low-energy regime. 2 points for using the correct electronic stopping power approximation (dE/dx = -kE½). 2 points for deriving the ion energy as a function of distance. 2 points for calculating the range of the Al ions in Al. 1 point for a range within 4.0 um to 5.0 um. Deduct 0.5 points for minor calculation errors. Deduct 1 point if units are missing or incorrect."
+    },
+    {
+      "question_number": 3,
+      "description": "Consider channeling of a recoil atom along the [100] direction in a simple cubic lattice with a lattice constant of 0.3 nm. The minimum channeling energy is 200 eV. What is the maximum injection angle for a 2 keV recoil entering along the axis to undergo channeling?",
+      "max_marks": 10,
+      "standard_answer": "6) Channeling along [100] direction in simple cubic lattice\n\nwith a₀ = 0.3 nm\nEch = 200 eV\nT = 2 keV\n\nπRch² = a₀²\n\nor Rch = a₀/√π from eq (M) lecture slides\n\nR = π * Ech / a₀²\n\nSubstitute into equ. (L) in lecture slides:\n\nθch = a₀/√π * √π * Ech / √a₀² * T = √ π * Ech / T * 200 / 2000 = 0.56 radians\n\nθch = 32°\n\nCritical angle for channeling (max. angle)",
+      "rubric": "3 points for correctly identifying the relevant equations for channeling. 2 points for calculating the critical radius. 3 points for substituting values and calculating the critical angle in radians. 2 points for converting the angle to degrees. Correct answer should be within 30 to 34 degrees. Deduct 0.5 points for minor calculation errors. Deduct 1 point if units are missing or incorrect."
+    },
+    {
+      "question_number": 4,
+      "description": "A 50-keV copper ion enters a channel in a copper lattice, and thus loses energy only by electronic stopping. Determine whether the Lindhard (low-energy) or Bethe-Bohr (high-energy) stopping power formula is more appropriate, and then determine the distance traveled by the ion before it is de-channeled, assuming a minimum channeling energy of 300 eV.",
+      "max_marks": 10,
+      "standard_answer": "7) 50-keV Copper in Copper for 50 keV under \"normal\" conditions, we would need to include elastic collisions @ 50-keV.  BUT: Channeling => no nuclear collisions in the channel so we can neglect!\n\nFollow procedure as in question 5\n\nVion = 4.0 x 10⁵ m/s < Ve,bound = 2.1 x 10⁷ m/s\n\nLow-energy electronic stopping approximation is valid (Lindhard)\n\nSame Range equation as in 5 but now minimum energy is the channeling energy:\n\n∫ dE/E½ = -K ∫ dx => E(x) = [(Ei)½ - (kx/2)²]² => x = [(Ei)½ - (Ech)½] / K\n\nK = 0.3 (N) (Z)⅔ N = (6.022 x 10²³) / 64 g * 8.96 g/cm³ = 8.43 x 10²²\n\n=> N = 0.0843 atoms/Å³\n\nK = (0.3) (0.0843) (29)⅔\n\nK = 0.2387 √(eV)/Å\n\nR = (√(50,000) - √(300)).2/0.2387\n\nR = 1728 Å = 172.8 nm\n\nWithout channeling the actual range would be ~ 30 nm, as a 50 keV Cu recoil has mainly nuclear collisions!\n\nRange associated with channeling much higher than actual range as nuclear collisions are absent during channeling!",
+      "rubric": "2 points for correctly identifying the low-energy regime and Lindhard stopping power. 2 points for calculating the electronic stopping parameter K. 3 points for setting up the integral and deriving the distance traveled equation considering the channeling energy. 3 points for a final answer within the range of 160 nm to 185 nm. Deduct 0.5 points for minor calculation errors. Deduct 1 point if units are missing or incorrect."
+    },
+    {
+      "question_number": 5,
+      "description": "Summarize the three major radiation mixing (ion-ion collision) mechanisms (also sometimes called ion beam mixing). What are the operative time frames for the different mechanisms? Which mechanism is typically most important for energetic massive ions? What is a typical value for the amount of mixing per dpa (“replacements per atom”) for energetic displacement cascade conditions (>10 keV PKAs)?",
+      "max_marks": 10,
+      "standard_answer": "8) Three major radiation mixing:\n\n1) RECOIL IMPLANTATION (t ~ 10⁻¹⁴ s) \"moving long ways\" associated with primary recoil atom events\n\n2) CASCADE MIXING (t ~ 10⁻¹³ s) associated with initial ballistic stage during cascade formation (described by binary collisions)\n\n3) THERMAL SPIKE (t ~ 10⁻¹¹ s) atomic mixing during relatively long cooling period associated with the thermal spike.\n=> Dominant mechanisms for typical cascades being 1 order of magnitude larger than other two mechanisms. Mixing per dpa for energetic cascades is ~50 replacements (see OECD report Figures)",
+      "rubric": "3 points for correctly listing and describing the three major radiation mixing mechanisms. 3 points for correctly stating the approximate time frames for each mechanism. 2 points for correctly identifying thermal spike/cascade mixing as the most important for energetic massive ions. 2 points for providing a reasonable value for mixing per dpa (40-60 replacements). Deduct 1 point for missing one of the mixing mechanisms or incorrect time scales."
+    }
+  ]
+}
