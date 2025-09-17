@@ -19,6 +19,8 @@ from google.adk.agents.invocation_context import InvocationContext
 # --- Logging Configuration ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('GradeAntPlus-Step3-Interactive')
+
+# Suppress noisy internal warnings from the libraries
 logging.getLogger('google_adk').setLevel(logging.WARNING)
 logging.getLogger('google.genai').setLevel(logging.ERROR)
 logging.getLogger('google.genai.models').setLevel(logging.ERROR)
@@ -26,8 +28,8 @@ logging.getLogger('google.generativeai').setLevel(logging.ERROR)  # Fixed typo
 logging.getLogger('httpx').setLevel(logging.ERROR)
 logging.getLogger('google_genai').setLevel(logging.WARNING) # prevent AFC Call warning
 
+# Set working directory to the code folder
 code_folder = Path(os.path.dirname(os.path.abspath(__file__)))
-
 os.chdir(code_folder)
 input_dir = code_folder.parent / "input"
 output_dir = code_folder.parent / "output"
@@ -65,7 +67,7 @@ def human_interaction_tool(tool_context: ToolContext, prompt: str) -> dict:
     logger.info(f"HumanTool: Received input: '{human_input}'")
     
     # Allow the user to exit the loop early
-    if human_input.lower() in ['done', 'exit', 'got it', 'thanks']:
+    if human_input.lower() in ['done', 'exit', 'got it', 'thanks', 'skip']:
         logger.info("HumanTool: User indicated conversation is complete. Escalating to exit loop.")
         print("🔚 User requested to end conversation.")
         tool_context.escalate = True  # This signals the parent LoopAgent to stop
@@ -134,7 +136,7 @@ correct_answer_agent = LlmAgent(
     instruction=CORRECT_ANSWER_INSTRUCTION,
 )
 
-# --- Updated Teaching Agent ---
+# --- Agent 3: Teaching Agent ---
 TEACHING_AGENT_INSTRUCTION = """You are a Socratic physics tutor in a multi-turn conversation. Your goal is to guide a student to discover their own mistake.
 
 **CONTEXT:**
@@ -156,8 +158,9 @@ teaching_agent = LlmAgent(
 )
 
 # ==============================================================================
-# SECTION 4: CUSTOM AGENTS FOR ORCHESTRATION (Fixed implementation)
+# SECTION 4: CUSTOM AGENTS FOR ORCHESTRATION
 # ==============================================================================
+# --- Agent 4: Feedback Triage Agent ---
 class FeedbackTriageAgent(BaseAgent):
     def __init__(self):
         super().__init__(name="FeedbackTriageAgent")
@@ -193,6 +196,7 @@ class FeedbackTriageAgent(BaseAgent):
         print(f"\n✅ FEEDBACK STATUS: {status}\n")
         yield Event(author=self.name)
 
+# --- Agent 5: Gatekeeper Agent ---
 class GatekeeperAgent(BaseAgent):
     def __init__(self, name: str, state_key_to_check: str, required_value: str):
         super().__init__(name=name)
@@ -210,13 +214,14 @@ class GatekeeperAgent(BaseAgent):
 # SECTION 5: ORCHESTRATOR DEFINITION (Updated)
 # ==============================================================================
 
-# This is the new, dedicated loop for the 3-turn teaching conversation.
+# This is dedicated loop for the 3-turn teaching conversation.
 teaching_loop = LoopAgent(
     name="TeachingLoop",
     sub_agents=[teaching_agent],
     max_iterations=3  # The conversation will last at most 3 turns
 )
 
+# This is praise branch, runs only if the feedback status is correct.
 conditional_praise_branch = LoopAgent(
     name="ConditionalPraiseBranch",
     sub_agents=[
@@ -255,31 +260,21 @@ question_processor = SequentialAgent(
 )
 
 # ==============================================================================
-# SECTION 6: MAIN APPLICATION LOGIC (Simplified)
+# SECTION 6: AGENT RUNNER
 # ==============================================================================
-
-def load_questions_from_file(filename: str) -> list:
-    """Loads the list of questions from a JSON file."""
-    try:
-        with open(filename, 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        logger.error(f"Could not load questions from '{filename}': {e}")
-        return []
-
-async def grade_ant_plus_main(qa_file: Path):
+async def grade_ant_plus_main(input_questions: list):
     """Main function uses the master orchestrator to run the full process."""
+    
+    if not input_questions:
+        return
+    
     service = InMemorySessionService()
     runner = Runner(
         agent=question_processor, 
         session_service=service, 
         app_name="GradeAntPlus"
     )
-
-    input_questions = load_questions_from_file(qa_file)
-    if not input_questions:
-        return
-
+    
     print("--- Starting GradeAnt+ Session (with Interactive Feedback) ---")
     print(f"📊 Total questions to process: {len(input_questions)}")
 
@@ -337,8 +332,28 @@ async def grade_ant_plus_main(qa_file: Path):
         print(f"\n✅ Finished Processing Question {idx}: {question_data.get('question_id', 'UNKNOWN')}")
         print("-" * 60)
 
+
+# ==============================================================================
+# SECTION 7: MAIN APPLICATION
+# ==============================================================================
+def load_questions_from_file(filename: str) -> list:
+    """Loads the list of questions from a JSON file."""
+    try:
+        with open(filename, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logger.error(f"Could not load questions from '{filename}': {e}")
+        return []
+
+async def main():
+    qa_file_path = input_dir / "qa.json"
+    input_questions = load_questions_from_file(qa_file_path)
+    if input_questions:
+        await grade_ant_plus_main(input_questions)
+        print("\n--- All questions processed. Session complete. ---")
+    else:
+        print("\n--- No questions found. ---")
+
 if __name__ == "__main__":
     os.system('clear')
-    qa_file_path = input_dir / "qa.json"
-    asyncio.run(grade_ant_plus_main(qa_file_path))
-    print("\n--- All questions processed. Session complete. ---")
+    asyncio.run(main())
