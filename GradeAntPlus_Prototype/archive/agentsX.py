@@ -84,7 +84,7 @@ def human_interaction_tool(tool_context: ToolContext, prompt: str) -> dict:
     # Allow the user to exit the loop early
     if human_input.lower() in ['done', 'exit', 'got it', 'thanks', 'skip']:
         logger.info("HumanTool: User indicated conversation is complete. Escalating to exit loop.")
-        print("📚 User requested to end conversation.")
+        print("🔚 User requested to end conversation.")
         tool_context.escalate = True  # This signals the parent LoopAgent to stop
         return {"human_response": human_input, "status": "completed"}
 
@@ -109,35 +109,16 @@ def text_to_speech_tool(tool_context: ToolContext, script_text: str) -> dict:
     """Converts a given text script into an MP3 audio file and saves it."""
     logger.info("TTS Tool: Starting audio conversion.")
     try:
-        # Check if a target audio path is set in the session state
-        target_audio_path = tool_context.state.get("target_audio_path")
-        
-        if target_audio_path:
-            # Use the predefined path from main.py
-            output_path = Path(target_audio_path)
-            logger.info(f"TTS Tool: Using target path: {output_path}")
-        else:
-            # Fallback to default path (for backward compatibility)
-            output_path = output_dir / f"audio_summary.mp3"
-            logger.info(f"TTS Tool: Using fallback path: {output_path}")
-        
-        # Ensure the directory exists
-        output_path.parent.mkdir(parents=True, exist_ok=True)
+        # Use the session ID to create a unique filename
+        output_path = output_dir / f"audio_summary.mp3"
 
         # Create the gTTS object and save the file
         tts = gTTS(text=script_text, lang='en', slow=False)
         tts.save(str(output_path))
         
         logger.info(f"TTS Tool: Audio file saved successfully to {output_path}")
-        
-        # Verify file was created and has content
-        if output_path.exists() and output_path.stat().st_size > 0:
-            logger.info(f"TTS Tool: Audio file verified - size: {output_path.stat().st_size} bytes")
-            return {"audio_file_path": str(output_path)}
-        else:
-            logger.error("TTS Tool: Audio file was not created or is empty")
-            return {"audio_file_path": None, "error": "Audio file creation failed"}
-            
+        # Return the path to be stored in the session state
+        return {"audio_file_path": str(output_path)}
     except Exception as e:
         logger.error(f"TTS Tool: Failed to generate audio file. Error: {e}")
         return {"audio_file_path": None, "error": str(e)}
@@ -205,7 +186,7 @@ audio_script_agent = LlmAgent(
 tts_agent = LlmAgent(
     model=MODEL,
     name="TtsAgent",
-    instruction="You have been given a script in the {audio_script} variable. Use the text_to_speech_tool to convert this script to an audio file. Call the tool with the script text as the parameter.",
+    instruction="You have been given a script in the {audio_script} variable. Use the text_to_speech_tool to convert this script to an audio file.",
     tools=[tts_tool],
     output_key="tts_output"
 )

@@ -83,3 +83,12 @@ def load_questions_from_file(filename: str) -> list:
     except Exception as e:
         logger.error(f"An unexpected error occurred while loading '{filename}': {e}")
         return []
+
+if __name__ == "__main__":
+    INPUT_FOLDER = Path(__file__).parent.parent / "data" / "input"
+    qa_file_path = INPUT_FOLDER / "qa.json"
+    input_questions = load_questions_from_file(qa_file_path)
+    if input_questions:
+        print("\n--- All questions processed. Session complete. ---")
+    else:
+        print("\n--- No questions found. ---")

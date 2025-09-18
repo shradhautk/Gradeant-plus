@@ -104,19 +104,8 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
     print("ALL QUESTIONS PROCESSED: Generating final report and audio summary...")
     print("="*100)
     
-    # Define consistent file naming upfront
-    base_filename = f"session_report_{session_id}"
-    output_report_path = OUTPUT_FOLDER / f"{base_filename}.json"
-    output_audio_path = OUTPUT_FOLDER / f"{base_filename}.mp3"
-    
-    # Update session state with the target audio path so TTS agent can use it
-    session = await service.get_session(app_name="GradeAntPlus", user_id=user_id, session_id=session_id)
-    session.state["target_audio_path"] = str(output_audio_path)
-    await service.create_session(app_name="GradeAntPlus", user_id=user_id, session_id=session_id, state=session.state)
-    
     # Creating a trigger message for the summary pipeline.
     summary_msg = types.Content(role="user", parts=[types.Part(text="Generate the final summary and audio.")])
-    
     # Executing the summary pipeline runner.
     async for event in summary_runner.run_async(user_id=user_id, session_id=session_id, new_message=summary_msg):
         if event.is_final_response():
@@ -127,42 +116,26 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
     full_transcript = final_session.state.get("full_transcript", [])
     final_summary = final_session.state.get("final_summary")
     tts_output = final_session.state.get("tts_output", {})
-    
-    # Handle audio file path more robustly
-    generated_audio_path = None
-    if isinstance(tts_output, dict):
-        generated_audio_path = tts_output.get("audio_file_path")
-    
-    # Determine final audio path
-    final_audio_path = None
-    if generated_audio_path and os.path.exists(generated_audio_path):
-        # If the generated audio path is different from target, move it
-        if generated_audio_path != str(output_audio_path):
-            try:
-                OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
-                shutil.move(generated_audio_path, output_audio_path)
-                final_audio_path = str(output_audio_path)
-                print(f"📊 Audio file moved to: {final_audio_path}")
-            except Exception as e:
-                print(f"⚠️ Warning: Could not move audio file: {e}")
-                final_audio_path = generated_audio_path
-        else:
-            final_audio_path = generated_audio_path
-    
+
+    #Checking if the audio file path is a string
+    audio_file_path = tts_output.get("audio_file_path") if isinstance(tts_output, dict) else None
+
     if full_transcript:
-        # Creating the final report object with consistent audio path
+        # Creating the final report object.
         final_report = {
             "session_summary": final_summary,
-            "audio_summary_path": final_audio_path,
+            "audio_summary_path": audio_file_path,
             "detailed_transcript": full_transcript
         }
 
         # Saving the final report to a file.
+        output_file_path = OUTPUT_FOLDER / f"session_report_{session_id}.json"
+        output_audio_path = OUTPUT_FOLDER / f"audio_summary_{session_id}.mp3"
         try:
             OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
-            with open(output_report_path, 'w', encoding='utf-8') as f:
+            with open(output_file_path, 'w', encoding='utf-8') as f:
                 json.dump(final_report, f, indent=2, ensure_ascii=False)
-            print(f"\n💾 Final report successfully saved to:\n   {output_report_path}")
+            print(f"\n💾 Final report successfully saved to:\n   {output_file_path}")
         except Exception as e:
             print(f"\n❌ Error saving report to file: {e}")
 
@@ -174,14 +147,11 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
         else:
             print("\n⚠️ Summary could not be generated.")
         
-        # Audio status reporting
-        if final_audio_path and os.path.exists(final_audio_path):
-            print(f"\n📊 Audio summary successfully saved to:\n   {final_audio_path}")
+        if audio_file_path:
+            print(f"\n🔊 Audio summary successfully saved to:\n   {audio_file_path}")
+            shutil.move(audio_file_path, output_audio_path)
         else:
             print("\n🔇 Audio summary could not be generated.")
-            if generated_audio_path:
-                print(f"   - Generated path was: {generated_audio_path}")
-                print(f"   - File exists: {os.path.exists(generated_audio_path) if generated_audio_path else False}")
     else:
         print("\n⚠️ No transcripts were generated during the session.")
 
@@ -233,7 +203,7 @@ async def main():
     qa_file_path = INPUT_FOLDER / "qa.json"
     
     #session id will consist of qa_file_path.name.split(".")[0] and a random uuid
-    session_id = f"{qa_file_path.name.split('.')[0]}_{str(uuid.uuid4())[:8]}"  # Shortened UUID for cleaner filenames
+    session_id = f"{qa_file_path.name.split(".")[0]}_{str(uuid.uuid4())}"
     user_id = "Narrie"
     
     input_questions = load_questions_from_file(qa_file_path)
@@ -242,7 +212,6 @@ async def main():
         print("\n--- All questions processed. Session complete. ---")
     else:
         print("\n--- No questions found. ---")
-
 # ==============================================================================
 if __name__ == "__main__":
     os.system('clear')
