@@ -10,8 +10,11 @@ import pprint
 import shutil
 
 from google.adk.sessions import InMemorySessionService
+from google.adk.sessions import DatabaseSessionService
 from google.adk.runners import Runner
 from google.genai import types
+
+#load_dotenv()
 
 from agents import question_pipeline, summary_pipeline
 from utils import get_logger, load_questions_from_file
@@ -21,7 +24,9 @@ logger = get_logger(__name__)
 proj_dir = Path(__file__).parent.parent
 INPUT_FOLDER = proj_dir / "data" / "input"
 OUTPUT_FOLDER = proj_dir / "data" / "output"
-
+#DB_FOLDER = proj_dir / "data" / "sessionDb"
+for folder in [OUTPUT_FOLDER]:#, DB_FOLDER]:
+    folder.mkdir(parents=True, exist_ok=True)
 # ==============================================================================
 # SECTION 2: FUNCTIONS
 # ==============================================================================
@@ -202,6 +207,9 @@ async def grade_ant_plus_main(input_questions: list, session_id: str = None, use
     
     # 1. Initialization
     service = InMemorySessionService()
+    #future 
+    #service = DatabaseSessionService(db_url=f"sqlite:///{DB_FOLDER}/{session_id}.db")
+
     question_runner = Runner(agent=question_pipeline, session_service=service, app_name="GradeAntPlus")
     summary_runner = Runner(agent=summary_pipeline, session_service=service, app_name="GradeAntPlus")
     
