@@ -2,7 +2,7 @@
     {
         "question_id": "q1",
         "question_text": "A car accelerates uniformly from rest to 20 m/s in 5 seconds. What is its acceleration?",
-        "student_answer": "a = (v - u)/t = (20 - 0)/5 = 4 m/s^2",
+        "student_answer": "a = (v - u)/t = (20 - 0)/5 = 4 m/s^3",
         "reference_answer": "Acceleration is given by a = (v - u)/t = (20 - 0)/5 = 4 m/s^2"
     },
     {

@@ -34,6 +34,10 @@ def get_logger(module_name):
         for lib in ['google_adk', 'google.genai', 'httpx']:
             logging.getLogger(lib).setLevel(logging.WARNING)
 
+        logging.getLogger('google.generativeai').setLevel(logging.ERROR)
+        logging.getLogger('google_adk').setLevel(logging.ERROR)
+        logging.getLogger('google_genai').setLevel(logging.ERROR)
+        
     return logger
 
 # ==============================================================================
