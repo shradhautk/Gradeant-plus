@@ -72,6 +72,34 @@ async def process_question_loop(question_runner: Runner, service: InMemorySessio
             if hasattr(event, 'author') and event.author: # Logging every agent event for debugging.
                 logger.info(f"Event from {event.author}")
             
+            # --- NEW: Block to log KnowledgeAgent's final output ---
+            if (event.is_final_response() and
+                event.author == "KnowledgeAgent" and
+                event.content and event.content.parts):
+                
+                print("\n" + "-"*40)
+                print("🧠 KNOWLEDGE AGENT FINAL LOG 🧠")
+                print("-"*40)
+                
+                # The structured output is in the `data` attribute of the first part
+                knowledge_response_dict = event.content.parts[0].text
+                print(knowledge_response_dict)
+                print("-"*40)
+            # ---------------------------------------------------------
+            if (event.is_final_response() and
+                event.author == "InteractiveTeachingAgent" and
+                event.content and event.content.parts):
+                
+                print("\n" + "-"*40)
+                print("🧠 TEACHING AGENT TOOL FINAL LOG 🧠")
+                print("-"*40)
+                
+                # The structured output is in the `data` attribute of the first part
+                orchestrator_response_dict = event.content.parts[0].text
+                print(orchestrator_response_dict)
+                print("-"*40)
+            # ---------------------------------------------------------
+
             if (event.is_final_response() and 
                 event.author == "CorrectAnswerAgent" and 
                 event.content):
@@ -237,7 +265,7 @@ async def grade_ant_plus_main(input_questions: list, session_id: str = None, use
 # SECTION 7: MAIN APPLICATION
 # ==============================================================================
 async def main():
-    # qa_file_path = INPUT_FOLDER / "Student_A_HW3_with_QP.json"
+    qa_file_path = INPUT_FOLDER / "Student_C_HW3_with_QP.json"
     qa_file_path = INPUT_FOLDER / "qa.json"
     
     #session id will consist of qa_file_path.name.split(".")[0] and a random uuid
