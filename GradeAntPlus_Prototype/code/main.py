@@ -17,7 +17,7 @@ from google.genai import types
 #load_dotenv()
 
 from agents import question_pipeline, summary_pipeline
-from utils import get_logger, load_questions_from_file
+from utils import get_logger, load_questions_from_file, create_markdown_summary
 
 logger = get_logger(__name__)
 
@@ -113,7 +113,8 @@ async def process_question_loop(question_runner: Runner, service: InMemorySessio
         transcript_object = {
             "question_data": question_data,
             "knowledge_response": session.state.get("knowledge_response"),
-            "conversation_history": session.state.get("conversation_history")
+            "conversation_history": session.state.get("conversation_history"),
+            "teaching_response": session.state.get("teaching_response") if session.state.get("teaching_response") else None
         }
         
         # Appending the transcript object to the full transcript.
@@ -138,9 +139,10 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
     print("="*100)
     
     # Define consistent file naming upfront
-    base_filename = f"session_report_{session_id}"
-    output_report_path = OUTPUT_FOLDER / f"{base_filename}.json"
-    output_audio_path = OUTPUT_FOLDER / f"{base_filename}.mp3"
+    base_filename = f"{session_id}"
+    output_report_path = OUTPUT_FOLDER / f"SessionReport_{base_filename}.json"
+    output_audio_path = OUTPUT_FOLDER / f"SessionAudioSummary_{base_filename}.mp3"
+    summary_report_path = OUTPUT_FOLDER / f"SessionSummary_{base_filename}.md"
     
     # Update session state with the target audio path so TTS agent can use it
     session = await service.get_session(app_name="GradeAntPlus", user_id=user_id, session_id=session_id)
@@ -198,6 +200,8 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
             print(f"\n💾 Final report successfully saved to:\n   {output_report_path}")
         except Exception as e:
             print(f"\n❌ Error saving report to file: {e}")
+
+        await create_markdown_summary(final_summary, summary_report_path)
 
         print("\n" + "-"*50)
         print("FINAL SUMMARY (CONSOLE PREVIEW):")

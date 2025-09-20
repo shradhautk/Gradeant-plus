@@ -73,6 +73,7 @@ def human_interaction_tool(tool_context: ToolContext, prompt: str) -> dict:
     print(f"  Current turn: {curr_turn}/3")
     print(f"  Total exchanges so far: {total_exchanges}")
 
+    human_input = "I'm not sure"   # default response if nothing eneterd
     print(f"\n🤖 GradeAnt+ Tutor: {prompt}")
     human_input = input("Your response: ").strip()
     logger.info(f"HumanTool: Received input: '{human_input}'")
