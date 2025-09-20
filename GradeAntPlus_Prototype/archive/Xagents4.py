@@ -61,10 +61,9 @@ class AudioScriptResponse(BaseModel):
 # ==============================================================================
 # --- Human Interaction Tool ---
 def human_interaction_tool(tool_context: ToolContext, prompt: str) -> dict:
-    """
-    Pauses execution, displays a prompt, waits for input, and returns a status.
-    This tool now manages turn counting and enforces the 3-turn limit.
-    """
+    """Pauses execution, displays a prompt to the human, and waits for their text input."""
+    
+    # --- REFACTORED: Read turn information from the state ---
     history = tool_context.state.get("conversation_history", [])
     curr_turn = len(history) // 2 + 1
     total_exchanges = len(history) // 2
@@ -73,30 +72,34 @@ def human_interaction_tool(tool_context: ToolContext, prompt: str) -> dict:
     print(f"  Current turn: {curr_turn}/3")
     print(f"  Total exchanges so far: {total_exchanges}")
 
+    # Present the agent's question to the user
     print(f"\n🤖 GradeAnt+ Tutor: {prompt}")
     human_input = input("Your response: ").strip()
+    
     logger.info(f"HumanTool: Received input: '{human_input}'")
     
-    # Update conversation history BEFORE making the status decision.
+    # Allow the user to exit the loop early
+    if human_input.lower() in ['exit', 'skip', 'quit']:
+        logger.info("HumanTool: User indicated conversation is complete. Escalating to exit loop.")
+        print("📚 User requested to end conversation.")
+        #tool_context.actions.escalate = True
+        return {"human_response": human_input, "status": "completed", "completed_turns": curr_turn+1}
+
+    # Update conversation history in the session state
     history.append({"role": "agent", "content": prompt})
     history.append({"role": "user", "content": human_input})
     tool_context.state["conversation_history"] = history
+    
     print(f"📝 Updated conversation history (now {len(history)} entries)")
-
-    # Decide the status based on user input or turn limit.
-    if human_input.lower() in ['exit', 'skip', 'quit', 'done']:
-        logger.info("HumanTool: User requested to end conversation.")
-        print("📚 User requested to end conversation.")
-        status = "completed"
-    elif curr_turn >= 3:
-        logger.info("HumanTool: Maximum turns reached.")
-        print("⏰ Maximum turns reached.")
-        status = "completed"
-    else:
-        status = "continue"
-        
+    status = "completed" if curr_turn >= 3 else "continue"
     return {"human_response": human_input, "status": status, "completed_turns": curr_turn+1}
 
+# --- Exit Loop Tool ---
+def exit_loop_tool(tool_context: ToolContext, reason: str) -> dict:
+    """Allows the TeachingAgent to programmatically exit the conversation loop."""
+    logger.info(f"ExitTool: Agent requested loop exit. Reason: {reason}")
+    tool_context.actions.escalate = True
+    return {"status": "exited_by_agent", "reason": reason}
 
 # --- Text-to-Speech Tool ---
 def text_to_speech_tool(tool_context: ToolContext, script_text: str) -> dict:
@@ -136,9 +139,32 @@ def text_to_speech_tool(tool_context: ToolContext, script_text: str) -> dict:
         logger.error(f"TTS Tool: Failed to generate audio file. Error: {e}")
         return {"audio_file_path": None, "error": str(e)}
 
+
+# A non-llm agent for inserting the turn number into the session state
+class TurnCounterAgent(BaseAgent):
+    """A simple agent that calculates and injects the current turn number into the state."""
+    def __init__(self, max_turns: int):
+        super().__init__(name="TurnCounterAgent")
+        self._max_turns = max_turns
+
+    async def _run_async_impl(self, context: InvocationContext) -> AsyncGenerator[Event, None]:
+        # 1. READS the conversation history from the session state
+        history = context.session.state.get("conversation_history", [])
+        
+        # 2. CALCULATES the current turn number
+        current_turn = (len(history) // 2) + 1
+
+        # 3. WRITES the turn info back into the session state
+        context.session.state["current_turn"] = current_turn
+        context.session.state["max_turns"] = self._max_turns
+
+        logger.info(f"TurnCounterAgent: It is now Turn {current_turn}/{self._max_turns}.")
+        yield Event(author=self.name)
+
 ###############################################################################################
 # --- Tools the agent can use ---
 human_tool = FunctionTool(func=human_interaction_tool)
+exit_tool = FunctionTool(func=exit_loop_tool)
 tts_tool = FunctionTool(func=text_to_speech_tool) # NEW: Create the tool instance
 
 # ==============================================================================
@@ -161,7 +187,7 @@ interactive_teaching_agent = LlmAgent(
     name="InteractiveTeachingAgent",
     description="Conducts a Socratic dialogue with the student.",
     instruction=INTERACTIVE_TEACHING_INSTRUCTION,
-    tools=[human_tool]
+    tools=[human_tool, exit_tool]
 )
 
 correct_answer_agent = LlmAgent(
@@ -174,6 +200,21 @@ correct_answer_agent = LlmAgent(
 # ==============================================================================
 # SECTION 5: LLM ORCHESTRATOR WITH AGENTTOOLS
 # ==============================================================================
+MAX_TEACHING_TURNS = 3
+
+teaching_loop_agent = LoopAgent(
+    name="TeachingLoopAgent",
+    description="Conducts a multi-turn Socratic dialogue with the student.",
+    sub_agents=[
+        TurnCounterAgent(max_turns=MAX_TEACHING_TURNS),
+        interactive_teaching_agent,
+    ],
+    max_iterations=MAX_TEACHING_TURNS,
+)
+
+# conditional nodes
+teaching_loop_agent_tool = AgentTool(agent=teaching_loop_agent)
+correct_answer_agent_tool = AgentTool(agent=correct_answer_agent)
 
 # The main orchestrator - conditional decision maker
 question_orchestrator = LlmAgent(
@@ -188,17 +229,14 @@ question_orchestrator = LlmAgent(
         The knowledge analysis is available in the {knowledge_response} variable.
 
         **SIMPLE ROUTING:**
-        - If the analysis indicates 'needs_feedback' is true, you MUST use the `teaching_agent`.
-        - If the analysis indicates 'needs_feedback' is false, you MUST use the `correct_answer_agent`.
-        - If you cannot determine needs_feedback value, default to teaching_agent for safety.
+        - If the analysis indicates 'needs_feedback' is true, you MUST use the `teaching_loop_agent_tool`.
+        - If the analysis indicates 'needs_feedback' is false, you MUST use the `correct_answer_agent_tool`.
+        - If you cannot determine needs_feedback value, default to teaching_loop_agent_tool for safety.
         
         Trust the boolean value from the knowledge analysis and call the appropriate tool.
         """),
-    sub_agents=[
-        interactive_teaching_agent,
-        correct_answer_agent
-    ]
-)
+    tools=[teaching_loop_agent_tool, correct_answer_agent_tool]
+    )
 
 # Main question processing pipeline: KnowledgeAgent → Orchestrator
 question_pipeline = SequentialAgent(
