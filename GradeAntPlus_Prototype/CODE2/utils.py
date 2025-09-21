@@ -359,6 +359,11 @@ async def create_enhanced_markdown_summary(summary_data: Dict[str, Any], transcr
     except Exception as e:
         logger.error(f"Failed to create enhanced markdown summary: {str(e)}")
 
+
+def datetime_uuid(seed:str):
+    """Generate a datetime-based unique identifier"""
+    return f"{datetime.now().strftime('%Y%m%d_%H%M')}_{seed}"
+
 # ==============================================================================
 # SECTION 6: COMPATIBILITY TEST
 # ==============================================================================

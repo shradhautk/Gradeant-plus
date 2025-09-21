@@ -18,7 +18,7 @@ from google.genai import types
 #load_dotenv()
 
 from agents import question_pipeline, summary_pipeline
-from utils import get_logger, load_and_validate_questions, create_enhanced_markdown_summary
+from utils import get_logger, load_and_validate_questions, create_enhanced_markdown_summary, datetime_uuid
 
 logger = get_logger(__name__)
 
@@ -30,9 +30,6 @@ for folder in [OUTPUT_FOLDER]:#, DB_FOLDER]:
     folder.mkdir(parents=True, exist_ok=True)
 
 
-def datetime_uuid(seed:str):
-    """Generate a datetime-based unique identifier"""
-    return f"{datetime.now().strftime('%Y%m%d_%H%M')}_{seed}"
 # ==============================================================================
 # SECTION 2: FUNCTIONS
 # ==============================================================================
