@@ -30,10 +30,18 @@ from utils import get_logger
 logger = get_logger(__name__)
 
 MODEL = "gemini-2.0-flash"
+
+# API key: read from <repo root>/.env (gitignored). Variables already set in the shell take precedence.
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent.parent / ".env")
+
 if os.getenv("GEMINI_MST_KEY"):
     os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_MST_KEY")
     print("Using GEMINI_MST_KEY for authentication.")
     del os.environ["GEMINI_MST_KEY"]
+
+if not os.getenv("GOOGLE_API_KEY"):
+    logger.warning("GOOGLE_API_KEY is not set. Copy .env.example to .env and add your Gemini API key.")
 
 output_dir = Path(__file__).parent.parent / "data" / "output"
 output_dir.mkdir(parents=True, exist_ok=True)

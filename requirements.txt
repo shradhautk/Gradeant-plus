@@ -5,3 +5,4 @@ httpx
 gradio
 pathlib
 gtts
+python-dotenv
