@@ -1,3 +1,28 @@
+#!/usr/bin/env python3
+# Module:  prompts.py
+# Version: 1.4.0
+"""
+================================================================================
+GradeAnt+ · Tutoring Pipeline · Prompt Layer
+================================================================================
+
+Title:       Agent instructions — the only prompt text in the pipeline
+Author:      Dr. Agarwal's Research Team
+Version:     1.4.0
+Date:        2025-09-21
+
+prompts.py — instruction strings for every agent in agents.py. Placeholders
+such as {knowledge_response} are filled by ADK from session state, so a key
+renamed in agents.py must be renamed here too.
+
+PUBLIC INTERFACE
+────────────────
+    KNOWLEDGE_AGENT_INSTRUCTION          QUESTION_ORCHESTRATOR_INSTRUCTION
+    CORRECT_ANSWER_INSTRUCTION           INTERACTIVE_TEACHING_INSTRUCTION
+    SUMMARIZATION_AGENT_INSTRUCTION      AUDIO_SCRIPT_AGENT_INSTRUCTION
+    TTS_AGENT_INSTRUCTION
+"""
+
 from textwrap import dedent
 # Enhanced prompts.py - Complete replacement file
 

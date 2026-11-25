@@ -1,3 +1,33 @@
+#!/usr/bin/env python3
+# Module:  main.py
+# Version: 1.6.1
+"""
+================================================================================
+GradeAnt+ · Tutoring Pipeline · Entry Point
+================================================================================
+
+Title:       Session runner — per-question tutoring loop and final report
+Author:      Dr. Agarwal's Research Team
+Version:     1.6.1
+Date:        2025-09-21
+
+main.py — runs one tutoring session for one student over a merged QA file.
+
+    python main.py          (input: data/input/qa.json, set in main())
+
+PUBLIC INTERFACE
+────────────────
+    grade_ant_plus_main(input_questions, session_id=None, user_id=None)
+    process_question_loop(question_runner, service, session_id, user_id, questions)
+    generate_final_report(summary_runner, service, session_id, user_id)
+
+OUTPUTS (data/output/)
+──────────────────────
+    StructuredLog_Session<id>.json   full transcript + summary
+    SummaryReport_Session<id>.md     study guide
+    SummaryAudio_Session<id>.mp3     audio summary
+"""
+
 # ==============================================================================
 # SECTION 1: IMPORTS
 # ==============================================================================

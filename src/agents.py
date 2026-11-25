@@ -1,3 +1,36 @@
+#!/usr/bin/env python3
+# Module:  agents.py
+# Version: 1.5.1
+"""
+================================================================================
+GradeAnt+ · Tutoring Pipeline · Agent Layer
+================================================================================
+
+Title:       Agent definitions — answer analysis, routing, Socratic tutoring,
+             session summary and audio
+Author:      Dr. Agarwal's Research Team
+Version:     1.5.1
+Date:        2025-09-21
+
+agents.py — every LLM agent in GradeAnt+ (Google ADK, gemini-2.0-flash) and
+the two pipelines main.py runs. Prompt text lives in prompts.py.
+
+PUBLIC INTERFACE
+────────────────
+    question_pipeline    KnowledgeAgent -> QuestionOrchestrator
+                           -> InteractiveTeachingAgent | CorrectAnswerAgent
+    summary_pipeline     SummarizationAgent -> AudioScriptAgent -> TtsAgent
+
+TOOLS
+─────
+    human_interaction_tool   terminal dialogue with the student, max 3 turns
+    text_to_speech_tool      gTTS -> MP3 at state["target_audio_path"]
+
+API KEY
+───────
+    GOOGLE_API_KEY loaded from <repo>/.env; shell variables take precedence.
+"""
+
 # ==============================================================================
 # SECTION 1: IMPROVED ORCHESTRATOR USING LLM + AGENTTOOLS
 # ==============================================================================

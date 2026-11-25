@@ -1,8 +1,26 @@
 #!/usr/bin/env python3
+# Module:  unit_test.py
+# Version: 1.0.0
 """
-Nuclear Physics Test Suite for GradeAnt+ Application
-Tests the system with real nuclear physics questions
+================================================================================
+GradeAnt+ · Tutoring Pipeline · Tests
+================================================================================
+
+Title:       End-to-end test suite for the GradeAnt+ tutoring pipeline
+Author:      Dr. Agarwal's Research Team
+Version:     1.0.0
+Date:        2025-09-21
+
+unit_test.py — runs complete tutoring sessions on sample physics questions,
+simulating student replies by patching input().
+
+    python unit_test.py      (calls the real Gemini API; needs .env)
+
+PUBLIC INTERFACE
+────────────────
+    main()      runs every test case and prints a pass/fail summary
 """
+
 
 import asyncio
 import json
