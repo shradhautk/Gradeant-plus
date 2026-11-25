@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import pprint
 import shutil
+from datetime import datetime
 
 from google.adk.sessions import InMemorySessionService
 from google.adk.sessions import DatabaseSessionService
@@ -17,16 +18,18 @@ from google.genai import types
 #load_dotenv()
 
 from agents import question_pipeline, summary_pipeline
-from utils import get_logger, load_questions_from_file, create_markdown_summary
+from utils import get_logger, load_and_validate_questions, create_enhanced_markdown_summary, datetime_uuid
 
 logger = get_logger(__name__)
 
 proj_dir = Path(__file__).parent.parent
 INPUT_FOLDER = proj_dir / "data" / "input"
-OUTPUT_FOLDER = proj_dir / "data" / "output"
+OUTPUT_FOLDER = proj_dir / "data" / "OUTPUT2"
 #DB_FOLDER = proj_dir / "data" / "sessionDb"
 for folder in [OUTPUT_FOLDER]:#, DB_FOLDER]:
     folder.mkdir(parents=True, exist_ok=True)
+
+
 # ==============================================================================
 # SECTION 2: FUNCTIONS
 # ==============================================================================
@@ -72,49 +75,50 @@ async def process_question_loop(question_runner: Runner, service: InMemorySessio
             if hasattr(event, 'author') and event.author: # Logging every agent event for debugging.
                 logger.info(f"Event from {event.author}")
             
-            # --- NEW: Block to log KnowledgeAgent's final output ---
+            # --- Enhanced logging for Knowledge Agent ---
             if (event.is_final_response() and
                 event.author == "KnowledgeAgent" and
                 event.content and event.content.parts):
                 
                 print("\n" + "-"*40)
-                print("🧠 KNOWLEDGE AGENT FINAL LOG 🧠")
+                print("🧠 KNOWLEDGE AGENT ANALYSIS 🧠")
                 print("-"*40)
                 
-                # The structured output is in the `data` attribute of the first part
                 knowledge_response_dict = event.content.parts[0].text
                 print(knowledge_response_dict)
                 print("-"*40)
-            # ---------------------------------------------------------
+
+            # --- Enhanced logging for Interactive Teaching Agent ---
             if (event.is_final_response() and
                 event.author == "InteractiveTeachingAgent" and
                 event.content and event.content.parts):
                 
                 print("\n" + "-"*40)
-                print("🧠 TEACHING AGENT TOOL FINAL LOG 🧠")
+                print("🎓 INTERACTIVE LEARNING SESSION COMPLETED 🎓")
                 print("-"*40)
                 
-                # The structured output is in the `data` attribute of the first part
-                orchestrator_response_dict = event.content.parts[0].text
-                print(orchestrator_response_dict)
+                teaching_response_dict = event.content.parts[0].text
+                print(teaching_response_dict)
                 print("-"*40)
-            # ---------------------------------------------------------
 
+            # --- Enhanced logging for Correct Answer Agent ---
             if (event.is_final_response() and 
                 event.author == "CorrectAnswerAgent" and 
                 event.content):
-                print(f"\n🎉 GradeAnt+ Says: {event.content.parts[0].text}")
+                print(f"\n🎉 GradeAnt+ Feedback: {event.content.parts[0].text}")
         
         # After processing, saving the results for this question.
-        print("\n💾 Saving transcript for this question...")
+        print("\n💾 Saving comprehensive transcript for this question...")
         session = await service.get_session(app_name="GradeAntPlus", user_id=user_id, session_id=session_id)
         
-        # Creating the transcript object.
+        # Creating the enhanced transcript object with additional metadata
         transcript_object = {
             "question_data": question_data,
             "knowledge_response": session.state.get("knowledge_response"),
             "conversation_history": session.state.get("conversation_history"),
-            "teaching_response": session.state.get("teaching_response") if session.state.get("teaching_response") else None
+            "teaching_response": session.state.get("teaching_response") if session.state.get("teaching_response") else None,
+            "processing_timestamp": datetime.now().isoformat(),  # Fixed: direct datetime usage
+            "question_index": idx
         }
         
         # Appending the transcript object to the full transcript.
@@ -124,7 +128,7 @@ async def process_question_loop(question_runner: Runner, service: InMemorySessio
         
         # Saving the session state.
         await service.create_session(app_name="GradeAntPlus", user_id=user_id, session_id=session_id, state=session.state)
-        print(f"Transcript saved. Total transcripts stored: {len(full_transcript)}")
+        print(f"Enhanced transcript saved. Total transcripts: {len(full_transcript)}")
         
         print(f"\n✅ Finished Processing Question {idx}: {question_data.get('question_id', 'UNKNOWN')}")
 
@@ -133,16 +137,17 @@ async def process_question_loop(question_runner: Runner, service: InMemorySessio
 async def generate_final_report(summary_runner: Runner, service: InMemorySessionService, session_id: str, user_id: str):
     """
     Runs the summary pipeline and saves the final report to a file and prints it.
+    Enhanced with better analytics and reporting.
     """
     print("\n" + "="*100)
-    print("ALL QUESTIONS PROCESSED: Generating final report and audio summary...")
+    print("ALL QUESTIONS PROCESSED: Generating comprehensive final report and audio summary...")
     print("="*100)
     
     # Define consistent file naming upfront
     base_filename = f"{session_id}"
-    output_report_path = OUTPUT_FOLDER / f"SessionReport_{base_filename}.json"
-    output_audio_path = OUTPUT_FOLDER / f"SessionAudioSummary_{base_filename}.mp3"
-    summary_report_path = OUTPUT_FOLDER / f"SessionSummary_{base_filename}.md"
+    output_report_path = OUTPUT_FOLDER / f"StructuredLog_Session{base_filename}.json"
+    output_audio_path = OUTPUT_FOLDER /  f"SummaryAudio_Session{base_filename}.mp3"
+    summary_report_path = OUTPUT_FOLDER /f"SummaryReport_Session{base_filename}.md"
     
     # Update session state with the target audio path so TTS agent can use it
     session = await service.get_session(app_name="GradeAntPlus", user_id=user_id, session_id=session_id)
@@ -152,10 +157,18 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
     # Creating a trigger message for the summary pipeline.
     summary_msg = types.Content(role="user", parts=[types.Part(text="Generate the final summary and audio.")])
     
+    print("🔄 Running AI summarization and audio generation pipeline...")
+    
     # Executing the summary pipeline runner.
     async for event in summary_runner.run_async(user_id=user_id, session_id=session_id, new_message=summary_msg):
         if event.is_final_response():
             logger.info(f"Summary pipeline event from: {event.author}")
+            if event.author == "SummarizationAgent":
+                print("📊 Educational analysis completed")
+            elif event.author == "AudioScriptAgent":
+                print("📝 Podcast script generated")
+            elif event.author == "TtsAgent":
+                print("🔊 Audio conversion completed")
 
     # Retrieving the final session state containing all generated artifacts.
     final_session = await service.get_session(app_name="GradeAntPlus", user_id=user_id, session_id=session_id)
@@ -177,7 +190,7 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
                 OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
                 shutil.move(generated_audio_path, output_audio_path)
                 final_audio_path = str(output_audio_path)
-                print(f"📊 Audio file moved to: {final_audio_path}")
+                print(f"🔊 Audio file moved to: {final_audio_path}")
             except Exception as e:
                 print(f"⚠️ Warning: Could not move audio file: {e}")
                 final_audio_path = generated_audio_path
@@ -185,26 +198,42 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
             final_audio_path = generated_audio_path
     
     if full_transcript:
-        # Creating the final report object with consistent audio path
+        # Creating the enhanced final report object
         final_report = {
+            "session_metadata": {
+                "session_id": session_id,
+                "user_id": user_id,
+                "total_questions": len(full_transcript),
+                "generation_timestamp": datetime.now().isoformat(),
+                "ai_model_used": "gemini-2.0-flash"
+            },
             "session_summary": final_summary,
             "audio_summary_path": final_audio_path,
             "detailed_transcript": full_transcript
         }
 
-        # Saving the final report to a file.
+        # Saving the comprehensive final report to a file.
         try:
             OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
             with open(output_report_path, 'w', encoding='utf-8') as f:
                 json.dump(final_report, f, indent=2, ensure_ascii=False)
-            print(f"\n💾 Final report successfully saved to:\n   {output_report_path}")
+            print(f"\n💾 Comprehensive session report saved to:\n   {output_report_path}")
         except Exception as e:
             print(f"\n❌ Error saving report to file: {e}")
 
-        await create_markdown_summary(final_summary, summary_report_path)
+        # Generate enhanced markdown summary
+        try:
+            await create_enhanced_markdown_summary(final_summary, full_transcript, summary_report_path)
+            print(f"📝 Enhanced markdown summary saved to:\n   {summary_report_path}")
+        except Exception as e:
+            print(f"⚠️ Warning: Could not create enhanced markdown summary: {e}")
+            # Fallback to basic markdown summary
+            from utils import create_markdown_summary
+            await create_markdown_summary(final_summary, summary_report_path)
+            print(f"📝 Basic markdown summary saved to:\n   {summary_report_path}")
 
         print("\n" + "-"*50)
-        print("FINAL SUMMARY (CONSOLE PREVIEW):")
+        print("FINAL EDUCATIONAL SUMMARY (CONSOLE PREVIEW):")
         print("-"*50)
         if final_summary:
             pprint.pprint(final_summary)
@@ -213,7 +242,10 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
         
         # Audio status reporting
         if final_audio_path and os.path.exists(final_audio_path):
-            print(f"\n📊 Audio summary successfully saved to:\n   {final_audio_path}")
+            file_size = os.path.getsize(final_audio_path)
+            print(f"\n🔊 Audio summary successfully created:")
+            print(f"   Path: {final_audio_path}")
+            print(f"   Size: {file_size:,} bytes")
         else:
             print("\n🔇 Audio summary could not be generated.")
             if generated_audio_path:
@@ -227,9 +259,10 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
 async def grade_ant_plus_main(input_questions: list, session_id: str = None, user_id: str = None):
     """
     The main orchestrator function for the GradeAnt+ application.
+    Enhanced with better validation and error handling.
     """
     if not input_questions:
-        print("No questions loaded. Exiting.")
+        print("No valid questions loaded. Exiting.")
         return
     
     if not session_id:
@@ -237,32 +270,56 @@ async def grade_ant_plus_main(input_questions: list, session_id: str = None, use
     if not user_id:
         user_id = "student123"
     
+    print(f"🚀 INITIALIZING GRADEANT+ SESSION")
+    print(f"   Session ID: {session_id}")
+    print(f"   User ID: {user_id}")
+    print(f"   Questions to process: {len(input_questions)}")
+    
     # 1. Initialization
     service = InMemorySessionService()
-    #future 
+    #future enhancement: 
     #service = DatabaseSessionService(db_url=f"sqlite:///{DB_FOLDER}/{session_id}.db")
 
     question_runner = Runner(agent=question_pipeline, session_service=service, app_name="GradeAntPlus")
     summary_runner = Runner(agent=summary_pipeline, session_service=service, app_name="GradeAntPlus")
     
-    print("--- Starting GradeAnt+ Session (with Interactive Feedback) ---")
-    print(f"📊 Total questions to process: {len(input_questions)}")
+    print("\n--- Starting GradeAnt+ Enhanced Tutoring Session ---")
 
-    # 2. Session Initialization
+    # 2. Session Initialization with enhanced metadata
+    initial_state = {
+        "full_transcript": [],
+        "session_start_time": datetime.now().isoformat(),
+        "total_questions_planned": len(input_questions),
+        "user_id": user_id,
+        "session_id": session_id
+    }
     
-    # Creating the initial session state.
     await service.create_session(
         app_name="GradeAntPlus", 
         user_id=user_id, 
         session_id=session_id, 
-        state={"full_transcript": []}
+        state=initial_state
     )
 
-    # 2. Per-Question Processing
-    await process_question_loop(question_runner, service, session_id, user_id, input_questions)
+    # 3. Per-Question Processing with enhanced error handling
+    try:
+        await process_question_loop(question_runner, service, session_id, user_id, input_questions)
+    except Exception as e:
+        logger.error(f"Error during question processing: {e}")
+        print(f"❌ Error during question processing: {e}")
+        return
 
-    # 3. Final Report Generation
-    await generate_final_report(summary_runner, service, session_id, user_id)
+    # 4. Final Report Generation with enhanced analytics
+    try:
+        await generate_final_report(summary_runner, service, session_id, user_id)
+    except Exception as e:
+        logger.error(f"Error during report generation: {e}")
+        print(f"❌ Error during report generation: {e}")
+        return
+
+    print(f"\n🎓 SESSION COMPLETED SUCCESSFULLY")
+    print(f"   All {len(input_questions)} questions processed")
+    print(f"   Reports generated and saved to: {OUTPUT_FOLDER}")
 
 
 # ==============================================================================
@@ -272,16 +329,21 @@ async def main():
     qa_file_path = INPUT_FOLDER / "Student_C_HW3_with_QP.json"
     qa_file_path = INPUT_FOLDER / "qa.json"
     
-    #session id will consist of qa_file_path.name.split(".")[0] and a random uuid
-    session_id = f"{qa_file_path.name.split('.')[0]}_{str(uuid.uuid4())[:8]}"  # Shortened UUID for cleaner filenames
+    # Enhanced session ID with better formatting
+    session_id = datetime_uuid(qa_file_path.name.split('.')[0])
     user_id = "student_A"
     
-    input_questions = load_questions_from_file(qa_file_path)
+    print(f"🔍 Loading questions from: {qa_file_path}")
+    
+    # Use enhanced validation function
+    input_questions = load_and_validate_questions(qa_file_path)
     if input_questions:
         await grade_ant_plus_main(input_questions, session_id=session_id, user_id=user_id)
-        print("\n--- All questions processed. Session complete. ---")
+        print(f"\n🎉 GradeAnt+ session complete! Check {OUTPUT_FOLDER} for all generated files.")
     else:
-        print("\n--- No questions found. ---")
+        print(f"\n❌ No valid questions found in {qa_file_path}")
+        print("Please check the file format and ensure it contains valid question objects.")
+
 
 # ==============================================================================
 if __name__ == "__main__":
