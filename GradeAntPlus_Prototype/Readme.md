@@ -1,9 +1,10 @@
-Code is in the 'code' folder. Its output reports folder is 'data/OUTPUT2'.
+There are 2 codes now.
 
-(The earlier 'code' version was replaced by the improved 'CODE2' version, which was then renamed to 'code'.
-The previous version is available in git history, commit 627e3d7.)
+1. in 'code' folder. its associated output reports folder is 'data/output'
+2. in 'CODE2' folder, its associated output reports folder is 'data/OUTPUT2'.
 
-CODE2 improvements over the earlier version: better prompts, output sessions named with date-time encoding, and a more detailed summary.
+Core orchestration and functionality is same.
+CODE2 has better prompts, output session named with date-time encoding, and better detailed summary.
 
 21.Sep
 Added Unit test (z_unit_test.py) for testing the entire code, simulating nuclear physics questions.
