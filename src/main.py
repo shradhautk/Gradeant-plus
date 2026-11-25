@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Module:  main.py
-# Version: 1.6.2
+# Version: 1.6.3
 """
 ================================================================================
 GradeAnt+ · Tutoring Pipeline · Entry Point
@@ -8,7 +8,7 @@ GradeAnt+ · Tutoring Pipeline · Entry Point
 
 Title:       Session runner — per-question tutoring loop and final report
 Author:      Dr. Agarwal's Research Team
-Version:     1.6.2
+Version:     1.6.3
 Date:        2025-09-21
 
 main.py — runs one tutoring session for one student over a merged QA file.
@@ -481,14 +481,14 @@ async def main():
                         help="no API calls: run the session with canned agent responses")
     args = parser.parse_args()
 
-    qa_file_path = INPUT_FOLDER / "ne6241_hw3_with_QP.json"
+    qa_file_path = INPUT_FOLDER / "Student_C_HW3_with_QP.json"
     qa_file_path = INPUT_FOLDER / "qa.json"
     
     # Enhanced session ID with better formatting
     session_id = datetime_uuid(qa_file_path.name.split('.')[0])
     if args.dry_run:
         session_id += "_dryrun"
-    user_id = "Narrie"
+    user_id = "student_A"
     
     print(f"🔍 Loading questions from: {qa_file_path}")
     
