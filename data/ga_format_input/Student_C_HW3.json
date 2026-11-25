@@ -1,0 +1,40 @@
+{
+  "homework": "Homework 3 (Due on 25th March) Please refer to G.WAS book as discussed in the class (https://link.springer.com/book/10.1007/978-3-540-49472-0)",
+  "questions": [
+    {
+      "question_number": 1,
+      "subparts": [
+        {
+          "subpart": "a",
+          "description": "Using the relativistic expression for electron-atom energy transfer, calculate the minimum electron energy required to displace an atom in Al. Assume threshold displacement energies of 25 eV for Al.",
+          "reply": "𝐴𝑙: 𝐸𝑑 = 25𝑒𝑉 = 25 * 10^−6 𝑀𝑒𝑉, 𝑀𝑐^2 = 26.98 𝑎𝑚𝑢 * 931 𝑀𝑒𝑉/𝑎𝑚𝑢 = 25.12 * 10^3 𝑀𝑒𝑉\n\n𝐸𝑚𝑖𝑛^2 + 1.02 𝐸𝑚𝑖𝑛 − (25.12 * 10^3 𝑀𝑒𝑉 * 25 * 10^−6 𝑀𝑒𝑉)/2 = 0 → 𝐸𝑚𝑖𝑛^2 + 1.02 𝐸𝑚𝑖𝑛 − 3.14 * 10^−1 𝑀𝑒𝑉\nUsing quadratic solving, 𝐸𝑚𝑖𝑛 = 0.246 𝑀𝑒𝑉"
+        },
+        {
+          "subpart": "b",
+          "description": "Using the relativistic expression for electron-atom energy transfer, calculate the minimum electron energy required to displace an atom in Ta. Assume threshold displacement energies of 90 eV for Ta.",
+          "reply": "𝑇𝑎: 𝐸𝑑 = 90 𝑒𝑉 = 90 * 10^−6 𝑀𝑒𝑉, 𝑀𝑐^2 = 180.95 𝑎𝑚𝑢 * 931 𝑀𝑒𝑉/𝑎𝑚𝑢 = 168.4 * 10^3 𝑀𝑒𝑉\n\n𝐸𝑚𝑖𝑛^2 + 1.02 𝐸𝑚𝑖𝑛 − (168.4 * 10^3 * 90 * 10^−6)/2 = 𝐸𝑚𝑖𝑛^2 + 1.02 𝐸𝑚𝑖𝑛 − 7.581\nUsing quadratic solving, 𝐸𝑚𝑖𝑛 = 2.79 𝑀𝑒𝑉"
+        }
+      ]
+    },
+    {
+      "question_number": 2,
+      "description": "5 MeV Al ions are used to irradiate an Al sample. Determine whether these conditions represent the “high-energy” or “low-energy” regime for electronic stopping/ionization interactions in solids by comparing the electron orbital velocity of the bound electrons (Eq. 2.49 in lecture notes section 2.3) with the ion velocity (Eq. 2.47 in lecture notes). Using the appropriate electronic stopping power approximation, calculate the ion energy as a function of distance from the surface and determine the approximate range of the Al ions in Al. (see textbook for a convenient approximate relationship between the distance traveled by the ion R and the projected range Rp).",
+      "reply": "Ion Velocity: 𝑣𝑖 = 1.41 * 10^4 √𝐸/𝑀 = 1.41 * 10^4 √(5 * 10^3𝑒𝑉)/(26.98 𝑎𝑚𝑢) = 6.42 * 10^6 𝑚/𝑠\n\nOrbital Velocity: 𝑉𝑜𝑟𝑏𝑖𝑡𝑎𝑙 = 2.2 * 10^6 (𝑍)^2/3 = 2.2 * 10^6 (13)^2/3 = 1.02 * 10^7 𝑚/𝑠\n\n𝑉𝑖 < 𝑉𝑜𝑟𝑏𝑖𝑡𝑎𝑙. Low-energy ions (𝑑𝐸/𝑑𝑥)𝑐ℎ𝑎𝑛𝑛𝑒𝑙 = 𝐾√𝐸 → (𝑑𝐸/𝑑𝑥)𝑐ℎ𝑎𝑛𝑛𝑒𝑙 = 𝐾√𝐸 → 𝑑𝐸 = 𝐾 𝑑𝑥\n\n→ ∫𝐸^(1/2) 𝑑𝐸 = ∫𝐾 𝑑𝑥 → 2/3 𝐸^(3/2) = 𝐾𝑥 + 𝐶 : 𝐼.𝐶. 𝑊ℎ𝑒𝑛 𝑥 = 0, 𝐸 = 𝐸0 → 𝐶 = 2/3 √𝐸0 → 𝐸(𝑥) = (𝐾𝑥/2 + √𝐸0)^2\n\nFrom textbook: For like atoms, 𝑏 = 3𝑁𝑍𝑒^2 𝑑/𝐸^(1/2) = 999.52 𝑒𝑉/𝑛𝑚, 𝑁 ≈ 60.25 /𝑛𝑚^3\n\n𝐸(𝑥) = (999.52𝑥 + √44.72 * 10^3)^2 𝑒𝑉\n\n𝑅 = (6𝐸 * 2 * 𝑀^2 (2 𝑍^(2/3))^(1/2))/(𝑝^2 𝑍 𝑀) , 𝐸 = 5000 𝑘𝑒𝑉, 𝑍 = 13, 𝑀 = 26.98, 𝑝 = 2.7 𝑔/𝑐𝑚^3\n\n= (12 * 500 * 26.98^2 (2 * 13^(2/3))^(1/2))/(2.7^2 * 13^2 * 26.98) = 1179.7 𝑛𝑚\n\nFor 𝑀𝑎/𝑚 = 1, 𝑅/𝑅𝑝 ≈ 1.6 → 1179.7/1.6 → 𝑅𝑝 = 737.3 𝑛𝑚"
+    },
+    {
+      "question_number": 3,
+      "description": "Consider channeling of a recoil atom along the [100] direction in a simple cubic lattice with a lattice constant of 0.3 nm. The minimum channeling energy is 200 eV. What is the maximum injection angle for a 2 keV recoil entering along the axis to undergo channeling?",
+      "reply": "Θ𝑚𝑎𝑥 = 𝑅𝑐ℎ √𝐸/𝐸0\n𝜋𝑅𝑐ℎ^2 = 𝐴 → 𝑅𝑐ℎ = 𝑎/𝜋 = 0.169 𝑛𝑚\n𝐾 = (𝐴/(𝐼𝑝 Δ𝑥)) exp(−𝑅𝑐ℎ/Δ𝑥)\n𝐼𝑐ℎ = 𝑎\n\n𝐾 = (0.3/0.03) exp(−0.169/0.03) = 140662.1 𝑒𝑉/𝐴\nΘ𝑚𝑎𝑥 = 0.169 (140662 * 10^3/2000)^(1/2) = 1.42 𝑟𝑎𝑑 = 81.3°"
+    },
+    {
+      "question_number": 4,
+      "description": "A 50-keV copper ion enters a channel in a copper lattice, and thus loses energy only by electronic stopping. Determine whether the Lindhard (low-energy) or Bethe-Bohr (high-energy) stopping power formula is more appropriate, and then determine the distance traveled by the ion before it is de-channeled, assuming a minimum channeling energy of 300 eV.",
+      "reply": "𝑉𝑒𝑙𝑜𝑐𝑖𝑡𝑦 = 2.2 * 10^6 𝑍^(2/3) = 2.2 * 13^(2/3) = 2.078 * 10^7 𝑚/𝑠\n𝑉𝑖 = 1.41 * 10^4 √𝐸/𝑀 = 1.41 * 10^4 √(50000 𝑒𝑉)/26.98 𝑎𝑚𝑢 = 3.95 * 10^5 𝑚/𝑠 → 𝑉𝑜 > 𝑉𝑖, 𝐿𝑜𝑠𝑠 𝐸𝑛𝑒𝑟𝑔𝑦\n\nFrom Question 2, 𝐸(𝑥) = (𝐾√𝑥/2 + √𝐸0)^2\n\n𝑆0 = ∫(√(50000) − 2404.915𝑥)^2 = 4/3 𝐾 √𝐸0 𝑥^(3/2) = 3 * 999.52 * (4472 * 10^3)^(1/2) * 𝑥^(3/2) = 2404.915 𝑒𝑉 * 𝑛𝑚\n\n2404.915 𝑥 = 206.29 𝑒𝑉 → 𝑥 = 0.086 𝑛𝑚"
+    },
+    {
+      "question_number": 5,
+      "description": "Summarize the three major radiation mixing (ion-ion collision) mechanisms (also sometimes called ion beam mixing). What are the operative time frames for the different mechanisms? Which mechanism is typically most important for energetic massive ions? What is a typical value for the amount of mixing per dpa (“replacements per atom”) for energetic displacement cascade conditions (>10 keV PKAs)?",
+      "reply": "Recoil Implantation: Within 0.1 picoseconds, the PkAs transfer energy to recoils through collisions, the energized recoils are then implanted into a different part of the material.  This mechanism contributes the least to the variation in mixing, with the area of mixing being limited to < 1 nm^2/dpa.\n\nCascade Mixing: In about a picosecond, the secondary recoils from the original collisions cause further displacements that \"mix\" over a larger area.  The process continues until the atoms no longer possess enough energy to cause further displacements.  This mechanism covers an area of about 10 nm^2/dpa.\n\nThermal Spike: Over a couple picoseconds, the excess energy of the atoms is distributed across the surrounding atoms. The spike in average energy or temperature causes the atoms to diffuse along with the heat gradient.  This mechanism causes the mixing of the largest area at about 100 nm^2/dpa, and it is most important for massive ions."
+    }
+  ]
+}

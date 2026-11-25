@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Module:  main.py
-# Version: 1.6.2
+# Version: 1.6.3
 """
 ================================================================================
 GradeAnt+ · Tutoring Pipeline · Entry Point
@@ -8,7 +8,7 @@ GradeAnt+ · Tutoring Pipeline · Entry Point
 
 Title:       Session runner — per-question tutoring loop and final report
 Author:      Dr. Agarwal's Research Team
-Version:     1.6.2
+Version:     1.6.3
 Date:        2025-09-21
 
 main.py — runs one tutoring session for one student over a merged QA file.
