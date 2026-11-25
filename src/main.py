@@ -15,8 +15,6 @@ from google.adk.sessions import DatabaseSessionService
 from google.adk.runners import Runner
 from google.genai import types
 
-#load_dotenv()
-
 from agents import question_pipeline, summary_pipeline
 from utils import get_logger, load_and_validate_questions, create_enhanced_markdown_summary, datetime_uuid
 
@@ -24,7 +22,7 @@ logger = get_logger(__name__)
 
 proj_dir = Path(__file__).parent.parent
 INPUT_FOLDER = proj_dir / "data" / "input"
-OUTPUT_FOLDER = proj_dir / "data" / "OUTPUT2"
+OUTPUT_FOLDER = proj_dir / "data" / "output"
 #DB_FOLDER = proj_dir / "data" / "sessionDb"
 for folder in [OUTPUT_FOLDER]:#, DB_FOLDER]:
     folder.mkdir(parents=True, exist_ok=True)

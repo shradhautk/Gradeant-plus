@@ -5,7 +5,7 @@ from pathlib import Path
 import uuid
 
 #############################################################################################################
-proj_dir = Path(__file__).parent.parent  # as the file is in code directory
+proj_dir = Path(__file__).parent.parent  # as the file is in src directory
 INPUT_FOLDER = proj_dir / "data" / "ga_format_input"
 OUTPUT_FOLDER = proj_dir / "data" / "input"
 

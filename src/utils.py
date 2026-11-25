@@ -21,9 +21,9 @@ def get_logger(module_name):
 
     if not logger.handlers:
         # File handler
-        log_file = LOG_DIR / f"{module_name}.log"
+        log_file = LOG_DIR / "gradeantplus.log"
         file_handler = logging.FileHandler(log_file)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
 
