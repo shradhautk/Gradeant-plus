@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Module:  main.py
-# Version: 1.6.1
+# Version: 1.6.2
 """
 ================================================================================
 GradeAnt+ · Tutoring Pipeline · Entry Point
@@ -8,16 +8,19 @@ GradeAnt+ · Tutoring Pipeline · Entry Point
 
 Title:       Session runner — per-question tutoring loop and final report
 Author:      Dr. Agarwal's Research Team
-Version:     1.6.1
+Version:     1.6.2
 Date:        2025-09-21
 
 main.py — runs one tutoring session for one student over a merged QA file.
 
-    python main.py          (input: data/input/qa.json, set in main())
+    python main.py              (input: data/input/qa.json, set in main())
+    python main.py --dry-run    no API calls, no key needed: canned agent
+                                responses exercise loading, routing and reports
 
 PUBLIC INTERFACE
 ────────────────
     grade_ant_plus_main(input_questions, session_id=None, user_id=None)
+    dry_run_session(input_questions, session_id, user_id)
     process_question_loop(question_runner, service, session_id, user_id, questions)
     generate_final_report(summary_runner, service, session_id, user_id)
 
@@ -26,11 +29,14 @@ OUTPUTS (data/output/)
     StructuredLog_Session<id>.json   full transcript + summary
     SummaryReport_Session<id>.md     study guide
     SummaryAudio_Session<id>.mp3     audio summary
+    (dry runs add "_dryrun" to <id> and write no audio)
 """
+from __future__ import annotations  # ADK type hints stay unevaluated, so --dry-run needs no ADK import
 
 # ==============================================================================
 # SECTION 1: IMPORTS
 # ==============================================================================
+import argparse
 import uuid
 import json
 import asyncio
@@ -40,12 +46,8 @@ import pprint
 import shutil
 from datetime import datetime
 
-from google.adk.sessions import InMemorySessionService
-from google.adk.sessions import DatabaseSessionService
-from google.adk.runners import Runner
-from google.genai import types
-
-from agents import question_pipeline, summary_pipeline
+# Live-run dependencies (Google ADK, Gemini, agents.py) are imported inside the
+# functions that use them, so a --dry-run works without them or an API key.
 from utils import get_logger, load_and_validate_questions, create_enhanced_markdown_summary, datetime_uuid
 
 logger = get_logger(__name__)
@@ -67,6 +69,7 @@ async def process_question_loop(question_runner: Runner, service: InMemorySessio
     """
     Loops through each question, runs the question_processor agent, and stores the transcript.
     """
+    from google.genai import types
     # Looping through each question from the input file.
     for idx, question_data in enumerate(input_questions, 1):
         print(f"\n{'='*100}")
@@ -167,6 +170,7 @@ async def generate_final_report(summary_runner: Runner, service: InMemorySession
     Runs the summary pipeline and saves the final report to a file and prints it.
     Enhanced with better analytics and reporting.
     """
+    from google.genai import types
     print("\n" + "="*100)
     print("ALL QUESTIONS PROCESSED: Generating comprehensive final report and audio summary...")
     print("="*100)
@@ -304,6 +308,10 @@ async def grade_ant_plus_main(input_questions: list, session_id: str = None, use
     print(f"   Questions to process: {len(input_questions)}")
     
     # 1. Initialization
+    from google.adk.sessions import InMemorySessionService
+    from google.adk.runners import Runner
+    from agents import question_pipeline, summary_pipeline
+
     service = InMemorySessionService()
     #future enhancement: 
     #service = DatabaseSessionService(db_url=f"sqlite:///{DB_FOLDER}/{session_id}.db")
@@ -351,21 +359,144 @@ async def grade_ant_plus_main(input_questions: list, session_id: str = None, use
 
 
 # ==============================================================================
+# SECTION 6: DRY RUN (no API calls)
+# ==============================================================================
+
+DRY_RUN_NOTICE = ("DRY RUN - NOT A REAL SESSION. No model was called; every analysis, "
+                  "dialogue and summary in this file is a canned placeholder used to test the pipeline.")
+
+
+def _mark_markdown_as_dry_run(path: Path) -> None:
+    """Tag the study guide's title and add a warning banner under it."""
+    if not path.exists():
+        return
+    text = path.read_text(encoding="utf-8")
+    banner = f"> ⚠️ **{DRY_RUN_NOTICE}**\n\n"
+    if text.startswith("# "):
+        title, _, rest = text.partition("\n")
+        text = f"# [DRY RUN] {title[2:]}\n\n{banner}{rest.lstrip(chr(10))}"
+    else:
+        text = banner + text
+    path.write_text(text, encoding="utf-8")
+
+
+def _dry_run_knowledge(idx: int) -> dict:
+    """Canned KnowledgeAgent output. Odd questions are 'correct' and even ones
+    'need feedback', so both routing branches are exercised."""
+    correct = idx % 2 == 1
+    return {
+        "is_correct": correct,
+        "needs_feedback": not correct,
+        "misconceptions": [] if correct else ["[dry run] placeholder misconception"],
+        "missing_steps": [] if correct else ["[dry run] placeholder missing step"],
+        "key_concepts": ["[dry run] placeholder concept"],
+        "hint": "[dry run] What principle connects the quantities in this problem?",
+        "confidence": "dry-run",
+    }
+
+
+async def dry_run_session(input_questions: list, session_id: str, user_id: str):
+    """
+    Runs the full session flow with canned agent responses instead of LLM calls:
+    no API key, network or Google ADK needed. Writes the same JSON log and
+    markdown study guide as a live run (no audio), so input loading, routing,
+    transcripts and report generation can be checked end to end.
+    """
+    print("🧪 DRY RUN: no model is called; all agent responses are canned placeholders.")
+    logger.info(f"[DRY RUN] Started session {session_id}: no model calls, canned responses")
+    print(f"   Session ID: {session_id}")
+    print(f"   User ID: {user_id}")
+    print(f"   Questions to process: {len(input_questions)}")
+
+    full_transcript = []
+    for idx, question_data in enumerate(input_questions, 1):
+        knowledge = _dry_run_knowledge(idx)
+        if knowledge["needs_feedback"]:
+            route = "InteractiveTeachingAgent"
+            conversation = [
+                {"role": "agent", "content": knowledge["hint"]},
+                {"role": "user", "content": "[dry run] simulated student reply"},
+            ]
+            teaching = "[dry run] placeholder Socratic dialogue summary"
+            correct_answer = None
+        else:
+            route = "CorrectAnswerAgent"
+            conversation = []
+            teaching = None
+            correct_answer = "[dry run] placeholder positive reinforcement"
+
+        print(f"   [{idx}/{len(input_questions)}] {question_data.get('question_id', 'UNKNOWN')} -> {route}")
+        full_transcript.append({
+            "question_data": question_data,
+            "knowledge_response": knowledge,
+            "conversation_history": conversation,
+            "teaching_response": teaching,
+            "correct_answer_response": correct_answer,
+            "processing_timestamp": datetime.now().isoformat(),
+            "question_index": idx,
+        })
+
+    final_summary = {
+        "session_overview": "[dry run] placeholder session overview",
+        "key_concepts_and_formulas": "[dry run] placeholder concepts and formulas",
+        "common_misconceptions_addressed": "[dry run] placeholder misconceptions",
+        "areas_for_further_study": "[dry run] placeholder study advice",
+    }
+
+    output_report_path = OUTPUT_FOLDER / f"StructuredLog_Session{session_id}.json"
+    summary_report_path = OUTPUT_FOLDER / f"SummaryReport_Session{session_id}.md"
+    final_report = {
+        "dry_run_notice": DRY_RUN_NOTICE,
+        "session_metadata": {
+            "session_id": session_id,
+            "user_id": user_id,
+            "total_questions": len(full_transcript),
+            "generation_timestamp": datetime.now().isoformat(),
+            "ai_model_used": "none (dry run)",
+            "dry_run": True,
+        },
+        "session_summary": final_summary,
+        "audio_summary_path": None,
+        "detailed_transcript": full_transcript,
+    }
+
+    OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
+    with open(output_report_path, "w", encoding="utf-8") as f:
+        json.dump(final_report, f, indent=2, ensure_ascii=False)
+    await create_enhanced_markdown_summary(final_summary, full_transcript, summary_report_path)
+    _mark_markdown_as_dry_run(summary_report_path)
+
+    print(f"\n💾 Session log:  {output_report_path}")
+    print(f"📝 Study guide:  {summary_report_path}")
+    print("🔇 Audio: skipped in dry run")
+    logger.info(f"[DRY RUN] Completed session {session_id}: {len(full_transcript)} questions")
+
+
+# ==============================================================================
 # SECTION 7: MAIN APPLICATION
 # ==============================================================================
 async def main():
+    parser = argparse.ArgumentParser(description="Run a GradeAnt+ tutoring session.")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="no API calls: run the session with canned agent responses")
+    args = parser.parse_args()
+
     qa_file_path = INPUT_FOLDER / "ne6241_hw3_with_QP.json"
     qa_file_path = INPUT_FOLDER / "qa.json"
     
     # Enhanced session ID with better formatting
     session_id = datetime_uuid(qa_file_path.name.split('.')[0])
+    if args.dry_run:
+        session_id += "_dryrun"
     user_id = "Narrie"
     
     print(f"🔍 Loading questions from: {qa_file_path}")
     
     # Use enhanced validation function
     input_questions = load_and_validate_questions(qa_file_path)
-    if input_questions:
+    if input_questions and args.dry_run:
+        await dry_run_session(input_questions, session_id=session_id, user_id=user_id)
+    elif input_questions:
         await grade_ant_plus_main(input_questions, session_id=session_id, user_id=user_id)
         print(f"\n🎉 GradeAnt+ session complete! Check {OUTPUT_FOLDER} for all generated files.")
     else:

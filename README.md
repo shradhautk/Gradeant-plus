@@ -65,33 +65,24 @@ gradeant-plus/
 │   └── unit_test.py    end-to-end test with simulated student replies
 │
 ├── .env.example        API key template
+├── run_instructions.md detailed run guide
 ├── README.md
 └── requirements.txt
 ```
 
-## Setup
+## Running GradeAnt+
 
 ```bash
 pip install -r requirements.txt
 cp .env.example .env        # then set GOOGLE_API_KEY (Gemini) in .env
-```
-
-`.env` is gitignored; never commit a real key.
-
-## Usage
-
-Run all commands from `src/`:
-
-```bash
 cd src
-python utils.py --convert   # web UI (port 7860): merge a GradeAnt answer file
-                            # with the question paper into data/input/
-python main.py              # run an interactive tutoring session
-python unit_test.py         # end-to-end test (calls the Gemini API)
+python main.py --dry-run    # test run: no API calls
+python main.py              # interactive tutoring session
 ```
 
-`main.py` reads `data/input/qa.json` by default; change `qa_file_path` in
-`main()` to use another merged file.
+**For full instructions, see [run_instructions.md](run_instructions.md):**
+preparing and merging input files, choosing the session input, dry runs, live
+sessions, outputs, tests and troubleshooting.
 
 ## Sample Output
 
@@ -111,10 +102,6 @@ Python · Google Agent Development Kit (ADK) · Gemini 2.0 Flash · gTTS · Grad
 ## Status
 
 Working prototype, developed September 2025.
-
-## Next Steps
-
-<!-- TO BE FILLED IN -->
 
 ## Authors
 
