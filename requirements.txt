@@ -1,0 +1,6 @@
+google-adk
+google-genai
+gradio
+gtts
+python-dotenv
+pydantic

@@ -1,0 +1,14 @@
+[
+    {
+        "question_id": "q1",
+        "question_text": "A car accelerates uniformly from rest to 20 m/s in 5 seconds. What is its acceleration?",
+        "student_answer": "a = (v - u)/t = (20 - 0)/5 = 4 m/s^3",
+        "reference_answer": "Acceleration is given by a = (v - u)/t = (20 - 0)/5 = 4 m/s^2"
+    },
+    {
+        "question_id": "q8",
+        "question_text": "A capacitor in a circuit has a capacitance of 2 µF and a voltage of 50 V. What is the charge stored?",
+        "student_answer": "Q = C * V = 2 * 50 = 100 µC",
+        "reference_answer": "Charge in a capacitor is Q = C * V = 2 µF * 50 V = 100 µC"
+    }
+]
